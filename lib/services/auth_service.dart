@@ -16,9 +16,13 @@ class AuthService {
         password: password,
       );
 
+      // Send email verification
+      await credential.user?.sendEmailVerification();
+
       // Create user document in Firestore
       await _firestore.collection('users').doc(credential.user!.uid).set({
         'email': email,
+        'emailVerified': false,
         'createdAt': FieldValue.serverTimestamp(),
       });
 

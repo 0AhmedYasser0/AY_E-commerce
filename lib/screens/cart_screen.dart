@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
 import '../models/cart_item.dart';
 import 'checkout_success_screen.dart';
+import 'address_screen.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
@@ -10,13 +11,17 @@ class CartScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: const Color(0xFFF5F5F8),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: const Text(
-          'Cart',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          'My Cart',
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.w800,
+            fontSize: 20,
+          ),
         ),
         centerTitle: true,
       ),
@@ -50,26 +55,36 @@ class CartScreen extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.shopping_cart_outlined,
-            size: 80,
-            color: Colors.grey[400],
+          Container(
+            width: 120,
+            height: 120,
+            decoration: BoxDecoration(
+              color: const Color(0xFF9775FA).withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.shopping_bag_outlined,
+              size: 60,
+              color: Color(0xFF9775FA),
+            ),
           ),
-          const SizedBox(height: 16),
-          Text(
+          const SizedBox(height: 24),
+          const Text(
             'Your cart is empty',
             style: TextStyle(
-              fontSize: 18,
-              color: Colors.grey[600],
-              fontWeight: FontWeight.w500,
+              fontSize: 22,
+              color: Colors.black87,
+              fontWeight: FontWeight.w700,
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            'Add items to get started',
+            'Looks like you haven\'t added\nanything to your cart yet',
+            textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 15,
               color: Colors.grey[500],
+              height: 1.5,
             ),
           ),
         ],
@@ -230,91 +245,90 @@ class CartScreen extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.2),
-            spreadRadius: 1,
-            blurRadius: 10,
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 20,
             offset: const Offset(0, -5),
           ),
         ],
       ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Subtotal',
-                style: TextStyle(fontSize: 16, color: Colors.grey),
-              ),
-              Text(
-                '\$${cart.subtotal.toStringAsFixed(2)}',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+      child: SafeArea(
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Subtotal',
+                  style: TextStyle(fontSize: 15, color: Colors.grey[600]),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              key: const Key('checkout_button'),
-              onPressed: () => _showCheckoutDialog(context, cart),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF9775FA),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                Text(
+                  '\$${cart.subtotal.toStringAsFixed(2)}',
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.black87,
+                  ),
                 ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Container(
+              width: double.infinity,
+              height: 56,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF9775FA), Color(0xFF7B5FD4)],
+                ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF9775FA).withValues(alpha: 0.4),
+                    blurRadius: 15,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
               ),
-              child: const Text(
-                'Checkout',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              child: ElevatedButton(
+                key: const Key('checkout_button'),
+                onPressed: () => _showCheckoutDialog(context, cart),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.shopping_bag_outlined, color: Colors.white),
+                    SizedBox(width: 10),
+                    Text(
+                      'Proceed to Checkout',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   void _showCheckoutDialog(BuildContext context, CartProvider cart) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Confirm Checkout'),
-        content: Text(
-          'Total: \$${cart.subtotal.toStringAsFixed(2)}\n\nProceed with checkout?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              await cart.clearCart();
-              if (context.mounted) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const CheckoutSuccessScreen(),
-                  ),
-                );
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF9775FA),
-            ),
-            child: const Text('Confirm', style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
+    // Navigate to Address Screen instead of showing dialog
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const AddressScreen()),
     );
   }
 }

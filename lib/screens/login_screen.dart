@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
+import '../providers/cart_provider.dart';
+import '../providers/favorites_provider.dart';
 import 'signup_screen.dart';
 import 'forgot_password_screen.dart';
+import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -28,12 +31,32 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    debugPrint('🔐 Login: Attempting sign in...');
+    
     final success = await authProvider.signIn(
       _emailController.text.trim(),
       _passwordController.text,
     );
 
-    if (!success && mounted) {
+    debugPrint('🔐 Login: Sign in result: $success');
+
+    if (success && mounted) {
+      debugPrint('🔐 Login: Success! Navigating to HomeScreen...');
+      
+      // Get userId and set it in providers immediately
+      final userId = authProvider.user?.uid;
+      if (userId != null) {
+        debugPrint('🔐 Login: Setting userId in providers: $userId');
+        Provider.of<CartProvider>(context, listen: false).setUserId(userId);
+        Provider.of<FavoritesProvider>(context, listen: false).setUserId(userId);
+        debugPrint('✅ Login: UserId set in providers');
+      }
+      
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+      );
+    } else if (!success && mounted) {
+      debugPrint('❌ Login: Failed - ${authProvider.error}');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(authProvider.error ?? 'Login failed'),

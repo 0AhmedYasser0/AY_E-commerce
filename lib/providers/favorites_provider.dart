@@ -13,10 +13,13 @@ class FavoritesProvider extends ChangeNotifier {
   bool get isEmpty => _favorites.isEmpty;
 
   void setUserId(String? userId) {
+    debugPrint('🔑 FavoritesProvider.setUserId called with: $userId');
     _userId = userId;
     if (userId != null) {
+      debugPrint('🔑 FavoritesProvider: Starting to listen to favorites for user: $userId');
       _listenToFavorites();
     } else {
+      debugPrint('🔑 FavoritesProvider: userId is null, clearing favorites');
       _favorites = [];
       notifyListeners();
     }
@@ -36,19 +39,33 @@ class FavoritesProvider extends ChangeNotifier {
   }
 
   Future<void> toggleFavorite(Product product) async {
-    if (_userId == null) return;
+    debugPrint('❤️ FavoritesProvider.toggleFavorite called for product: ${product.title}');
+    debugPrint('❤️ Current userId: $_userId');
+    
+    if (_userId == null) {
+      debugPrint('❌ FavoritesProvider: userId is NULL! Cannot toggle favorite.');
+      return;
+    }
 
     _isLoading = true;
     notifyListeners();
 
     try {
-      if (isFavorite(product.id)) {
+      final wasFavorite = isFavorite(product.id);
+      debugPrint('❤️ Product is currently favorite: $wasFavorite');
+      
+      if (wasFavorite) {
+        debugPrint('❤️ Removing from favorites...');
         await _firestoreService.removeFromFavorites(_userId!, product.id);
+        debugPrint('✅ Successfully removed from favorites');
       } else {
+        debugPrint('❤️ Adding to favorites...');
         await _firestoreService.addToFavorites(_userId!, product);
+        debugPrint('✅ Successfully added to favorites');
       }
     } catch (e) {
-      debugPrint('Error toggling favorite: $e');
+      debugPrint('❌ Error toggling favorite: $e');
+      rethrow;
     }
 
     _isLoading = false;
