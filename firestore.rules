@@ -1,0 +1,20 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Users collection - authenticated users can only access their own data
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Carts collection - authenticated users can only access their own cart items
+    match /carts/{userId}/items/{productId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Favorites collection - authenticated users can only access their own favorites
+    match /favorites/{userId}/items/{productId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
