@@ -77,7 +77,7 @@ A Flutter-based e-commerce mobile application for Android and iOS platforms.
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/0AhmedYasser0/AY_E-commerce.git
    cd flutter_application_mobile_project
    ```
 
