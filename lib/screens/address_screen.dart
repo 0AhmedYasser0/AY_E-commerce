@@ -58,37 +58,21 @@ class _AddressScreenState extends State<AddressScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final cart = context.watch<CartProvider>();
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F8),
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.black,
         elevation: 0,
         leading: IconButton(
-          icon: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                ),
-              ],
-            ),
-            child: const Icon(Icons.arrow_back_ios_new, size: 18, color: Colors.black),
-          ),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           'Shipping Address',
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
+          style: TextStyle(color: Colors.white),
         ),
-        centerTitle: true,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -100,25 +84,33 @@ class _AddressScreenState extends State<AddressScreen> {
               const Text(
                 'Delivery Information',
                 style: TextStyle(
-                  fontSize: 20,
+                  fontSize: 22,
                   fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
-                'Please fill in your shipping details',
+                'Please provide your shipping details',
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.grey[600],
+                  color: Colors.white.withOpacity(0.7),
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 30),
 
-              _buildTextField(
+              // Full Name
+              TextFormField(
                 controller: _nameController,
-                label: 'Full Name',
-                hint: 'Enter your full name',
-                icon: Icons.person_outline,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  labelText: 'Full Name',
+                  labelStyle: const TextStyle(color: Colors.white70),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  prefixIcon: const Icon(Icons.person, color: Colors.white70),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your name';
@@ -126,14 +118,21 @@ class _AddressScreenState extends State<AddressScreen> {
                   return null;
                 },
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
 
-              _buildTextField(
+              // Phone Number
+              TextFormField(
                 controller: _phoneController,
-                label: 'Phone Number',
-                hint: 'Enter your phone number',
-                icon: Icons.phone_outlined,
                 keyboardType: TextInputType.phone,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  labelText: 'Phone Number',
+                  labelStyle: const TextStyle(color: Colors.white70),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  prefixIcon: const Icon(Icons.phone, color: Colors.white70),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your phone number';
@@ -141,14 +140,21 @@ class _AddressScreenState extends State<AddressScreen> {
                   return null;
                 },
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
 
-              _buildTextField(
+              // Street Address
+              TextFormField(
                 controller: _addressController,
-                label: 'Street Address',
-                hint: 'Enter your street address',
-                icon: Icons.location_on_outlined,
                 maxLines: 2,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  labelText: 'Street Address',
+                  labelStyle: const TextStyle(color: Colors.white70),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  prefixIcon: const Icon(Icons.location_on, color: Colors.white70),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your address';
@@ -156,16 +162,23 @@ class _AddressScreenState extends State<AddressScreen> {
                   return null;
                 },
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
 
+              // City and ZIP Code
               Row(
                 children: [
                   Expanded(
-                    child: _buildTextField(
+                    child: TextFormField(
                       controller: _cityController,
-                      label: 'City',
-                      hint: 'City',
-                      icon: Icons.location_city_outlined,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        labelText: 'City',
+                        labelStyle: const TextStyle(color: Colors.white70),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        prefixIcon: const Icon(Icons.location_city, color: Colors.white70),
+                      ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Required';
@@ -176,12 +189,18 @@ class _AddressScreenState extends State<AddressScreen> {
                   ),
                   const SizedBox(width: 16),
                   Expanded(
-                    child: _buildTextField(
+                    child: TextFormField(
                       controller: _zipController,
-                      label: 'ZIP Code',
-                      hint: 'ZIP',
-                      icon: Icons.markunread_mailbox_outlined,
                       keyboardType: TextInputType.number,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        labelText: 'ZIP Code',
+                        labelStyle: const TextStyle(color: Colors.white70),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        prefixIcon: const Icon(Icons.numbers, color: Colors.white70),
+                      ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Required';
@@ -192,109 +211,74 @@ class _AddressScreenState extends State<AddressScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 40),
 
               // Order Summary
-              Consumer<CartProvider>(
-                builder: (context, cart, child) {
-                  return Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
-                          blurRadius: 20,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.grey[900],
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Order Summary',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Order Summary',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        _buildSummaryRow('Items', '${cart.itemCount}'),
-                        const SizedBox(height: 8),
-                        _buildSummaryRow('Subtotal', '\$${cart.subtotal.toStringAsFixed(2)}'),
-                        const SizedBox(height: 8),
-                        _buildSummaryRow('Shipping', 'Free'),
-                        const Divider(height: 24),
-                        _buildSummaryRow(
-                          'Total',
-                          '\$${cart.subtotal.toStringAsFixed(2)}',
-                          isBold: true,
-                        ),
-                      ],
+                    const SizedBox(height: 20),
+                    _buildSummaryRow('Items', '${cart.itemCount}'),
+                    const SizedBox(height: 10),
+                    _buildSummaryRow('Subtotal', '\$${cart.subtotal.toStringAsFixed(2)}'),
+                    const SizedBox(height: 10),
+                    _buildSummaryRow('Shipping', '\$5.99'),
+                    const SizedBox(height: 10),
+                    _buildSummaryRow('Tax', '\$${(cart.subtotal * 0.08).toStringAsFixed(2)}'),
+                    const Divider(height: 30, color: Colors.white24),
+                    _buildSummaryRow(
+                      'Total',
+                      '\$${(cart.subtotal + 5.99 + (cart.subtotal * 0.08)).toStringAsFixed(2)}',
+                      isTotal: true,
                     ),
-                  );
-                },
+                  ],
+                ),
               ),
+              const SizedBox(height: 40),
             ],
           ),
         ),
       ),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 20,
-              offset: const Offset(0, -5),
-            ),
-          ],
-        ),
+        color: Colors.black,
         child: SafeArea(
-          child: Container(
-            height: 56,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF9775FA), Color(0xFF7B5FD4)],
+          child: ElevatedButton(
+            onPressed: _isLoading ? null : _processCheckout,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF6366F1),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
               ),
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF9775FA).withValues(alpha: 0.4),
-                  blurRadius: 15,
-                  offset: const Offset(0, 8),
-                ),
-              ],
             ),
-            child: ElevatedButton(
-              onPressed: _isLoading ? null : _processCheckout,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.transparent,
-                shadowColor: Colors.transparent,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
+            child: _isLoading
+                ? const SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
               ),
-              child: _isLoading
-                  ? const SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      ),
-                    )
-                  : const Text(
-                      'Continue to Payment',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
+            )
+                : const Text(
+              'Continue to Payment',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
           ),
         ),
@@ -302,79 +286,24 @@ class _AddressScreenState extends State<AddressScreen> {
     );
   }
 
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required String hint,
-    required IconData icon,
-    TextInputType? keyboardType,
-    int maxLines = 1,
-    String? Function(String?)? validator,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: Colors.black87,
-          ),
-        ),
-        const SizedBox(height: 8),
-        TextFormField(
-          controller: controller,
-          keyboardType: keyboardType,
-          maxLines: maxLines,
-          validator: validator,
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: TextStyle(color: Colors.grey[400]),
-            prefixIcon: Icon(icon, color: const Color(0xFF9775FA)),
-            filled: true,
-            fillColor: Colors.white,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide.none,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(color: Colors.grey[200]!),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: Color(0xFF9775FA), width: 2),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: Colors.red),
-            ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSummaryRow(String label, String value, {bool isBold = false}) {
+  Widget _buildSummaryRow(String label, String value, {bool isTotal = false}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           label,
           style: TextStyle(
-            fontSize: isBold ? 16 : 14,
-            fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-            color: isBold ? Colors.black : Colors.grey[600],
+            color: Colors.white.withOpacity(isTotal ? 1 : 0.7),
+            fontSize: isTotal ? 16 : 14,
+            fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
           ),
         ),
         Text(
           value,
           style: TextStyle(
-            fontSize: isBold ? 18 : 14,
-            fontWeight: isBold ? FontWeight.bold : FontWeight.w600,
-            color: isBold ? const Color(0xFF9775FA) : Colors.black,
+            color: isTotal ? const Color(0xFF6366F1) : Colors.white,
+            fontSize: isTotal ? 18 : 15,
+            fontWeight: isTotal ? FontWeight.bold : FontWeight.w600,
           ),
         ),
       ],
