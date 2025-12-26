@@ -121,33 +121,39 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 60),
 
                     // حقل البريد الإلكتروني
-                    _buildTextField(
-                      controller: _emailController,
-                      label: 'Email Address',
-                      icon: Icons.alternate_email_rounded,
-                      keyboardType: TextInputType.emailAddress,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) return 'Please enter your email';
-                        if (!value.contains('@')) return 'Please enter a valid email';
-                        return null;
-                      },
+                    Semantics(
+                      label: 'email_field',
+                      child: _buildTextField(
+                        controller: _emailController,
+                        label: 'Email Address',
+                        icon: Icons.alternate_email_rounded,
+                        keyboardType: TextInputType.emailAddress,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) return 'Please enter your email';
+                          if (!value.contains('@')) return 'Please enter a valid email';
+                          return null;
+                        },
+                      ),
                     ),
 
                     const SizedBox(height: 20),
 
                     // حقل كلمة المرور
-                    _buildTextField(
-                      controller: _passwordController,
-                      label: 'Password',
-                      icon: Icons.lock_outline_rounded,
-                      isPassword: true,
-                      obscureText: _obscurePassword,
-                      togglePassword: () => setState(() => _obscurePassword = !_obscurePassword),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) return 'Please enter your password';
-                        if (value.length < 6) return 'At least 6 characters required';
-                        return null;
-                      },
+                    Semantics(
+                      label: 'password_field',
+                      child: _buildTextField(
+                        controller: _passwordController,
+                        label: 'Password',
+                        icon: Icons.lock_outline_rounded,
+                        isPassword: true,
+                        obscureText: _obscurePassword,
+                        togglePassword: () => setState(() => _obscurePassword = !_obscurePassword),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) return 'Please enter your password';
+                          if (value.length < 6) return 'At least 6 characters required';
+                          return null;
+                        },
+                      ),
                     ),
 
                     Align(
@@ -166,7 +172,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 40),
 
                     // زر تسجيل الدخول
-                    _buildLoginButton(),
+                    Semantics(
+                      label: 'login_button',
+                      button: true,
+                      enabled: true,
+                      child: _buildLoginButton(),
+                    ),
 
                     const SizedBox(height: 24),
 

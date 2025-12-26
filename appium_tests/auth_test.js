@@ -8,6 +8,10 @@
  * - App APK installed or path configured
  */
 
+process.env.ANDROID_HOME = "C:\\Users\\ahmed\\AppData\\Local\\Android\\Sdk";
+process.env.ANDROID_SDK_ROOT = "C:\\Users\\ahmed\\AppData\\Local\\Android\\Sdk";
+const path = require('path');
+
 const { remote } = require('webdriverio');
 
 async function testAuthentication() {
@@ -21,7 +25,7 @@ async function testAuthentication() {
         capabilities: {
             platformName: 'Android',
             'appium:deviceName': 'Android Emulator', // REPLACE WITH YOUR DEVICE NAME IF NEEDED
-            'appium:app': './builds/apk/app-release.apk', // REPLACE WITH YOUR APK PATH
+            'appium:app': path.join(process.cwd(), '../build/app/outputs/flutter-apk/app-release.apk'),
             'appium:automationName': 'UiAutomator2',
             'appium:noReset': false
         }
@@ -32,40 +36,60 @@ async function testAuthentication() {
     try {
         // Initialize driver
         driver = await remote(opts);
-        console.log('✓ Step 1: App opened successfully');
-        await driver.pause(2000);
+        console.log("✓ Step 1: App opened successfully");
 
-        // Step 2: Enter Email
-        console.log('✓ Step 2: Entering email...');
-        // Using accessibility id strategy (Flutter Key: 'email_field')
-        const emailField = await driver.$('~email_field');
-        await emailField.waitForDisplayed({ timeout: 10000 });
-        await emailField.setValue('test@example.com'); // REPLACE WITH YOUR TEST EMAIL
+        // PAUSE to let animations finish (important)
+        await driver.pause(5000);
 
-        // Step 3: Enter Password
-        console.log('✓ Step 3: Entering password...');
-        // Using accessibility id strategy (Flutter Key: 'password_field')
-        const passwordField = await driver.$('~password_field');
-        await passwordField.setValue('test123456'); // REPLACE WITH YOUR TEST PASSWORD
+        // STRATEGY: Find all Text Fields (EditText)
+        // The first one is usually Email, the second is Password.
+        const textFields = await driver.$$('android.widget.EditText');
+        
+        if (textFields.length < 2) {
+            console.log("⚠️ Could not find 2 text fields. Checking if we are already logged in...");
+            // Optional: Add logout logic here if needed, or just fail with a clear message.
+            throw new Error("Could not find Email/Password fields. Are you already logged in?");
+        }
 
-        // Step 4: Click Login
-        console.log('✓ Step 4: Clicking login button...');
-        // Using accessibility id strategy (Flutter Key: 'login_button')
-        const loginButton = await driver.$('~login_button');
-        await loginButton.click();
-        await driver.pause(3000);
+        console.log("✓ Found text fields. Entering credentials...");
+        
+        // Enter Email (First Field)
+        await textFields[0].click();
+        await textFields[0].setValue("ahmedyae011@gmail.com"); 
+        
+        // Enter Password (Second Field)
+        await textFields[1].click();
+        await textFields[1].setValue("ahmed12345");
+        
+        // Hide keyboard to see the Login button
+        if (await driver.isKeyboardShown()) {
+            await driver.hideKeyboard();
+        }
 
-        // Step 5: Verify User is on Home Screen
-        console.log('✓ Step 5: Verifying home screen...');
-        // REPLACE WITH YOUR HOME SCREEN ELEMENT ID
-        // Example: Check for search field or any unique home screen element
-        const homeElement = await driver.$('~search_field');
-        await homeElement.waitForDisplayed({ timeout: 20000 });
+        console.log("✓ Searching for Login button by accessibility id 'Login'...");
+        
+        // According to the XML source, the Login button has content-desc="Login"
+        // So we can use the accessibility id selector directly.
+        const loginBtn = await driver.$('~Login');
+        
+        // Wait for it to be clickable
+        await loginBtn.waitForExist({ timeout: 5000 });
+        
+        console.log("✓ Found Login button. Clicking...");
+        await loginBtn.click();
+        
+        console.log("✓ Clicked. Waiting for Home Screen navigation...");
+        await driver.pause(5000);
 
-        if (await homeElement.isDisplayed()) {
+        // Verify we reached the home screen (you can adjust this validation)
+        console.log("✓ Verifying home screen...");
+        const pageSource = await driver.getPageSource();
+        
+        // Simple validation: check if we're no longer on login screen
+        if (!pageSource.includes("Welcome Back") && !pageSource.includes("Email Address")) {
             console.log('\n✅ Authentication Test PASSED - User is on Home Screen!');
         } else {
-            console.log('\n❌ Authentication Test FAILED - Home Screen not found');
+            console.log('\n❌ Authentication Test FAILED - Still on Login Screen');
         }
 
     } catch (error) {

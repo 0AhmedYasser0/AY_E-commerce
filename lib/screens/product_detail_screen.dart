@@ -394,77 +394,82 @@ class ProductDetailScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: ElevatedButton(
-                  key: const Key('add_to_cart_button'),
-                  onPressed: cart.isLoading
-                      ? null
-                      : () async {
-                    debugPrint('🔘 Add to Cart button pressed');
-                    try {
-                      await cart.addToCart(product);
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: const Row(
-                              children: [
-                                Icon(Icons.check_circle_rounded, color: Colors.white),
-                                SizedBox(width: 10),
-                                Text('Added to cart successfully!'),
-                              ],
+                child: Semantics(
+                  label: 'add_to_cart_button',
+                  button: true,
+                  enabled: true,
+                  child: ElevatedButton(
+                    key: const Key('add_to_cart_button'),
+                    onPressed: cart.isLoading
+                        ? null
+                        : () async {
+                      debugPrint('🔘 Add to Cart button pressed');
+                      try {
+                        await cart.addToCart(product);
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: const Row(
+                                children: [
+                                  Icon(Icons.check_circle_rounded, color: Colors.white),
+                                  SizedBox(width: 10),
+                                  Text('Added to cart successfully!'),
+                                ],
+                              ),
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              backgroundColor: const Color(0xFF8B5CF6),
+                              duration: const Duration(seconds: 2),
                             ),
-                            behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                          );
+                        }
+                      } catch (e) {
+                        debugPrint('❌ Error in Add to Cart button: $e');
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Failed to add to cart: $e'),
+                              backgroundColor: const Color(0xFFEF4444),
+                              duration: const Duration(seconds: 2),
                             ),
-                            backgroundColor: const Color(0xFF8B5CF6),
-                            duration: const Duration(seconds: 2),
-                          ),
-                        );
+                          );
+                        }
                       }
-                    } catch (e) {
-                      debugPrint('❌ Error in Add to Cart button: $e');
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Failed to add to cart: $e'),
-                            backgroundColor: const Color(0xFFEF4444),
-                            duration: const Duration(seconds: 2),
-                          ),
-                        );
-                      }
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    shadowColor: Colors.transparent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                  ),
-                  child: cart.isLoading
-                      ? const SizedBox(
-                    height: 24,
-                    width: 24,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.5,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
-                  )
-                      : const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.shopping_bag_rounded, color: Colors.white, size: 22),
-                      SizedBox(width: 12),
-                      Text(
-                        'Add to Cart',
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                          letterSpacing: 0.5,
-                        ),
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
                       ),
-                    ],
+                    ),
+                    child: cart.isLoading
+                        ? const SizedBox(
+                      height: 24,
+                      width: 24,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.5,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                        : const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.shopping_bag_rounded, color: Colors.white, size: 22),
+                        SizedBox(width: 12),
+                        Text(
+                          'Add to Cart',
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               );

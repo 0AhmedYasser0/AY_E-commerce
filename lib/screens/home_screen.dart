@@ -201,42 +201,47 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildCartBadge() {
     return Consumer<CartProvider>(
-      builder: (context, cart, _) => GestureDetector(
-        onTap: () => setState(() => _currentIndex = 2),
-        child: Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: cardColor,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withOpacity(0.05)),
-          ),
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              const Icon(Icons.shopping_bag_outlined, color: Colors.white, size: 24),
-              if (cart.itemCount > 0)
-                Positioned(
-                  right: -5,
-                  top: -5,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: const BoxDecoration(
-                      color: Colors.redAccent,
-                      shape: BoxShape.circle,
-                    ),
-                    constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
-                    child: Text(
-                      '${cart.itemCount}',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
+      builder: (context, cart, _) => Semantics(
+        label: 'cart_icon',
+        button: true,
+        enabled: true,
+        child: GestureDetector(
+          onTap: () => setState(() => _currentIndex = 2),
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: cardColor,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.white.withOpacity(0.05)),
+            ),
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                const Icon(Icons.shopping_bag_outlined, color: Colors.white, size: 24),
+                if (cart.itemCount > 0)
+                  Positioned(
+                    right: -5,
+                    top: -5,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Colors.redAccent,
+                        shape: BoxShape.circle,
+                      ),
+                      constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                      child: Text(
+                        '${cart.itemCount}',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -287,7 +292,11 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisSpacing: 18,
           ),
           itemCount: provider.products.length,
-          itemBuilder: (context, index) => _buildProductCard(provider.products[index]),
+          itemBuilder: (context, index) => Semantics(
+            label: 'product_$index',
+            button: true,
+            child: _buildProductCard(provider.products[index]),
+          ),
         );
       },
     );
