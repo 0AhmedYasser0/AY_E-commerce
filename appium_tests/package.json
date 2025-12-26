@@ -1,0 +1,13 @@
+{
+  "name": "laza_appium_tests",
+  "version": "1.0.0",
+  "description": "Appium tests for Laza App",
+  "main": "index.js",
+  "scripts": {
+    "test:auth": "node auth_test.js",
+    "test:cart": "node cart_test.js"
+  },
+  "dependencies": {
+    "webdriverio": "^8.0.0"
+  }
+}
