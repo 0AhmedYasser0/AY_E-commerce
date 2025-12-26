@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'dart:ui';
 import '../providers/auth_provider.dart';
 import '../providers/cart_provider.dart';
 import '../providers/favorites_provider.dart';
@@ -20,6 +21,12 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
+  // باليتة الألوان الموحدة للمشروع
+  final Color bgColor = const Color(0xFF0F172A);
+  final Color cardColor = const Color(0xFF1E293B);
+  final Color accentColor = const Color(0xFF6366F1);
+  final Color purpleGradient = const Color(0xFFA855F7);
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -31,36 +38,29 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    debugPrint('🔐 Login: Attempting sign in...');
-    
+
     final success = await authProvider.signIn(
       _emailController.text.trim(),
       _passwordController.text,
     );
 
-    debugPrint('🔐 Login: Sign in result: $success');
-
     if (success && mounted) {
-      debugPrint('🔐 Login: Success! Navigating to HomeScreen...');
-      
-      // Get userId and set it in providers immediately
       final userId = authProvider.user?.uid;
       if (userId != null) {
-        debugPrint('🔐 Login: Setting userId in providers: $userId');
         Provider.of<CartProvider>(context, listen: false).setUserId(userId);
         Provider.of<FavoritesProvider>(context, listen: false).setUserId(userId);
-        debugPrint('✅ Login: UserId set in providers');
       }
-      
+
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
     } else if (!success && mounted) {
-      debugPrint('❌ Login: Failed - ${authProvider.error}');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(authProvider.error ?? 'Login failed'),
-          backgroundColor: Colors.red,
+          backgroundColor: Colors.redAccent,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
       );
     }
@@ -69,148 +69,206 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: 60),
-                Text(
-                  'Welcome',
-                  style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Please enter your data to continue',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 48),
-                TextFormField(
-                  key: const Key('email_field'),
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    border: UnderlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
-                    }
-                    if (!value.contains('@')) {
-                      return 'Please enter a valid email';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  key: const Key('password_field'),
-                  controller: _passwordController,
-                  obscureText: _obscurePassword,
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    border: const UnderlineInputBorder(),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword ? Icons.visibility_off : Icons.visibility,
+      backgroundColor: bgColor,
+      body: Stack(
+        children: [
+          // تأثير توهج جمالي في الخلفية
+          Positioned(
+            top: -100,
+            right: -50,
+            child: Container(
+              width: 300,
+              height: 300,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: accentColor.withOpacity(0.1),
+              ),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 70, sigmaY: 70),
+                child: Container(),
+              ),
+            ),
+          ),
+          SafeArea(
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.all(24),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const SizedBox(height: 60),
+                    Text(
+                      'Welcome Back',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 32,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -1,
                       ),
-                      onPressed: () {
-                        setState(() {
-                          _obscurePassword = !_obscurePassword;
-                        });
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Please enter your data to continue',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.5),
+                        fontSize: 15,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 60),
+
+                    // حقل البريد الإلكتروني
+                    _buildTextField(
+                      controller: _emailController,
+                      label: 'Email Address',
+                      icon: Icons.alternate_email_rounded,
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) return 'Please enter your email';
+                        if (!value.contains('@')) return 'Please enter a valid email';
+                        return null;
                       },
                     ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your password';
-                    }
-                    if (value.length < 6) {
-                      return 'Password must be at least 6 characters';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 8),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ForgotPasswordScreen(),
-                        ),
-                      );
-                    },
-                    child: const Text('Forgot Password?'),
-                  ),
-                ),
-                const SizedBox(height: 32),
-                Consumer<AuthProvider>(
-                  builder: (context, auth, child) {
-                    return ElevatedButton(
-                      key: const Key('login_button'),
-                      onPressed: auth.isLoading ? null : _login,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF9775FA),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+
+                    const SizedBox(height: 20),
+
+                    // حقل كلمة المرور
+                    _buildTextField(
+                      controller: _passwordController,
+                      label: 'Password',
+                      icon: Icons.lock_outline_rounded,
+                      isPassword: true,
+                      obscureText: _obscurePassword,
+                      togglePassword: () => setState(() => _obscurePassword = !_obscurePassword),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) return 'Please enter your password';
+                        if (value.length < 6) return 'At least 6 characters required';
+                        return null;
+                      },
+                    ),
+
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => const ForgotPasswordScreen()));
+                        },
+                        child: Text(
+                          'Forgot Password?',
+                          style: TextStyle(color: accentColor, fontWeight: FontWeight.w600),
                         ),
                       ),
-                      child: auth.isLoading
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                              ),
-                            )
-                          : const Text(
-                              'Login',
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                            ),
-                    );
-                  },
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text("Don't have an account? "),
-                    TextButton(
-                      key: const Key('signup_link'),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const SignupScreen(),
+                    ),
+
+                    const SizedBox(height: 40),
+
+                    // زر تسجيل الدخول
+                    _buildLoginButton(),
+
+                    const SizedBox(height: 24),
+
+                    // رابط إنشاء حساب
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("Don't have an account? ", style: TextStyle(color: Colors.white.withOpacity(0.6))),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => const SignupScreen()));
+                          },
+                          child: Text(
+                            'Sign Up',
+                            style: TextStyle(color: accentColor, fontWeight: FontWeight.bold),
                           ),
-                        );
-                      },
-                      child: const Text('Sign Up'),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
           ),
-        ),
+        ],
       ),
+    );
+  }
+
+  // مكوّن الحقول النصية المتناسق
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    bool isPassword = false,
+    bool obscureText = false,
+    VoidCallback? togglePassword,
+    TextInputType? keyboardType,
+    String? Function(String?)? validator,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
+      ),
+      child: TextFormField(
+        controller: controller,
+        obscureText: obscureText,
+        keyboardType: keyboardType,
+        style: const TextStyle(color: Colors.white),
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: TextStyle(color: Colors.white.withOpacity(0.4)),
+          prefixIcon: Icon(icon, color: accentColor.withOpacity(0.7), size: 22),
+          suffixIcon: isPassword
+              ? IconButton(
+            icon: Icon(obscureText ? Icons.visibility_off : Icons.visibility, color: Colors.grey),
+            onPressed: togglePassword,
+          )
+              : null,
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        ),
+        validator: validator,
+      ),
+    );
+  }
+
+  // مكوّن الزر المتناسق
+  Widget _buildLoginButton() {
+    return Consumer<AuthProvider>(
+      builder: (context, auth, child) {
+        return Container(
+          height: 60,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            gradient: LinearGradient(colors: [accentColor, purpleGradient]),
+            boxShadow: [
+              BoxShadow(
+                color: accentColor.withOpacity(0.3),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: ElevatedButton(
+            onPressed: auth.isLoading ? null : _login,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            ),
+            child: auth.isLoading
+                ? const SizedBox(height: 24, width: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                : const Text(
+              'Login',
+              style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.white),
+            ),
+          ),
+        );
+      },
     );
   }
 }
